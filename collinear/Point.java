@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.StdDraw;
+
 import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
@@ -39,28 +40,32 @@ public class Point implements Comparable<Point> {
     // the slope between this point and that point
     public double slopeTo(Point that) {
         if (this.x == that.x) {
-            if(that.y > this.y) {
-                return Double.POSITIVE_INFINITY;
-            } else {
+            if (that.y == this.y) {
                 return Double.NEGATIVE_INFINITY;
+            } else {
+                return Double.POSITIVE_INFINITY;
             }
+        }
+        if (this.y == that.y) {
+            return +0d;
         }
         return (double) (that.y - this.y) / (that.x - this.x);
     }
 
     // compare two points by slopes they make with this point
     public Comparator<Point> slopeOrder() {
-        return new slopeComparator();
+        return new SlopeComparator();
     }
 
-    private class slopeComparator implements Comparator<Point> {
+    private class SlopeComparator implements Comparator<Point> {
         @Override
         public int compare(Point p1, Point p2) {
             double slope1 = slopeTo(p1);
             double slope2 = slopeTo(p2);
             if (slope1 < slope2) {
                 return -1;
-            } if (slope1 > slope2) {
+            }
+            if (slope1 > slope2) {
                 return 1;
             } else {
                 return 0;

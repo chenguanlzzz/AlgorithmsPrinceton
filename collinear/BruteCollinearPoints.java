@@ -1,11 +1,8 @@
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 
 public class BruteCollinearPoints {
     private LineSegment[] segments;
@@ -14,44 +11,45 @@ public class BruteCollinearPoints {
     public BruteCollinearPoints(Point[] points) {
         checkIllegal(points);
         int n = points.length;
-
         if (n < 4) {
             segments = new LineSegment[0];
             return;
         }
-        Arrays.sort(points);
+        Point[] pointsClone = Arrays.copyOf(points, n);
+        Arrays.sort(pointsClone);
 
         ArrayList<LineSegment> segmentLst = new ArrayList<>();
         ArrayList<Double> slopeLst = new ArrayList<>();
 
         // Brute force to add line segment
         for (int p = 0; p < n - 3; p++) {
-            boolean brk = true;
-            for (int q = p + 1; q < n - 2 && brk; q++) {
-                double slope1 = points[p].slopeTo(points[q]);
-                if (slopeLst.contains(slope1)) {
+            Point p1 = pointsClone[p];
+            for (int q = p + 1; q < n - 2; q++) {
+                Point p2 = pointsClone[q];
+                double slope12 = p1.slopeTo(p2);
+                if (slopeLst.contains(slope12)) {
                     continue;
                 }
-                for (int r = q + 1; r < n - 1 && brk; r++) {
-                    double slope2 = points[p].slopeTo(points[r]);
-                    if (slope1 != slope2) {
+                for (int r = q + 1; r < n - 1; r++) {
+                    Point p3 = pointsClone[r];
+                    double slope13 = p1.slopeTo(p3);
+                    if (slope12 != slope13) {
                         continue;
                     }
-                    for (int s = r + 1; s < n && brk; s++) {
-                        double slope3 = points[p].slopeTo(points[s]);
-                        if (slope2 != slope3) {
-                            continue;
+                    int lastPoint = r + 1;
+                    Point p4 = pointsClone[lastPoint];
+                    double slope14 = p1.slopeTo(p4);
+                    while (lastPoint < n) {
+                        if (p1.slopeTo(pointsClone[lastPoint]) == slope12) {
+                            p4 = pointsClone[lastPoint];
+                            slope14 = p1.slopeTo(p4);
                         }
-                        int newS = s + 1;
-                        while(newS < n) {
-                            if (slope2 == points[p].slopeTo(points[newS])) {
-                                s = newS;
-                            }
-                            newS++;
-                        }
-                        segmentLst.add(new LineSegment(points[p], points[s]));
-                        slopeLst.add(slope1);
-                        brk = false;
+                        lastPoint++;
+                    }
+                    if (slope12 == slope14) {
+                        segmentLst.add(new LineSegment(p1, p4));
+                        slopeLst.add(slope12);
+                        break;
                     }
                 }
             }
@@ -61,17 +59,20 @@ public class BruteCollinearPoints {
 
     }
 
-    // Cheack the points are illegal or not
+    // Check the points are illegal or not
     private void checkIllegal(Point[] points) {
+        if (points == null) {
+            throw new IllegalArgumentException("points can't be null");
+        }
         int n = points.length;
-        if (points == null || points[n - 1] == null) {
+        if (points[n - 1] == null) {
             throw new IllegalArgumentException("Illegal points");
         }
+        Point[] pointsClone = Arrays.copyOf(points, n);
+        Arrays.sort(pointsClone);
         for (int i = 0; i < n - 1; i++) {
-            for (int j = i + 1; j < n; j++) {
-                if (points[i] == null || points[i] == points[j]) {
-                    throw new IllegalArgumentException("Illegal points");
-                }
+            if (pointsClone[i] == null || points[i].compareTo(points[i + 1]) == 0) {
+                throw new IllegalArgumentException("Illegal points");
             }
         }
     }
@@ -83,7 +84,7 @@ public class BruteCollinearPoints {
 
     // the line segments
     public LineSegment[] segments() {
-        return segments;
+        return segments.clone();
     }
 
     public static void main(String[] args) {
@@ -111,8 +112,8 @@ public class BruteCollinearPoints {
         BruteCollinearPoints collinear = new BruteCollinearPoints(points);
         for (LineSegment segment : collinear.segments()) {
             StdOut.println(segment);
-            //segment.draw();
+            // segment.draw();
         }
-        //StdDraw.show();
+        // StdDraw.show();
     }
 }
