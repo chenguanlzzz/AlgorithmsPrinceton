@@ -51,15 +51,6 @@ public class FastCollinearPoints {
         segments = segmentLst.toArray(new LineSegment[segmentLst.size()]);
     }
 
-
-    private Point[] slopeSameArr(Point[] points, int i, int j, Point org) {
-        Point[] slopeSameArr = new Point[j - i + 2];
-        System.arraycopy(points, i, slopeSameArr, 0, j - i + 1);
-        slopeSameArr[j - i + 1] = org;
-        Arrays.sort(slopeSameArr);
-        return slopeSameArr;
-    }
-
     // the number of line segments
     public int numberOfSegments() {
         return segments.length;
@@ -67,7 +58,7 @@ public class FastCollinearPoints {
 
     // the line segments
     public LineSegment[] segments() {
-        return segments;
+        return segments.clone();
     }
 
     // Check the points are illegal or not
@@ -82,7 +73,7 @@ public class FastCollinearPoints {
         Point[] pointsClone = Arrays.copyOf(points, n);
         Arrays.sort(pointsClone);
         for (int i = 0; i < n - 1; i++) {
-            if (pointsClone[i] == null || points[i].compareTo(points[i + 1]) == 0) {
+            if (pointsClone[i] == null || pointsClone[i].compareTo(pointsClone[i + 1]) == 0) {
                 throw new IllegalArgumentException("Illegal points");
             }
         }
