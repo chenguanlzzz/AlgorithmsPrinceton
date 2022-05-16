@@ -132,8 +132,9 @@ public class KdTree {
     }
 
     // a nearest neighbor in the set to point p; null if the set is empty
-    public Point2D nearest(Point2D p){
+    public Point2D nearest(Point2D p) {
         if (p == null) throw new IllegalArgumentException("Can't check null point.");
+        if (root == null) return null;
         return nearest(root, p, root.p);
     }
 
@@ -141,9 +142,9 @@ public class KdTree {
         if (root == null) return nearestPt;
         if (root.p.distanceTo(p) < nearestPt.distanceTo(p)) nearestPt = root.getPoint(); // if the of this node has shorter distance to target, update the nearest point.
 
-        if (root.rectSmaller.contains(p)) {  // if the target point is in the one side rectangle. Search first in the rectangle that contains the point.
+        if (root.rectSmaller.contains(p) || root.rectSmaller.distanceTo(p) < root.rectLarger.distanceTo(p)) {  // if the target point is in the one side rectangle or close to one side of rectangle. Search first in this rectangle.
             nearestPt = nearest(root.smaller, p, nearestPt);
-            if (nearestPt.distanceTo(p) > root.rectLarger.distanceTo(p)) { // then if the the other rectangle has shorter than current nearest, go search the other rectangle. else don't need to search.
+            if (nearestPt.distanceTo(p) > root.rectLarger.distanceTo(p)) { // then if the the other rectangle has shorter distance than current nearest, go search the other rectangle. else don't need to search.
                 nearestPt = nearest(root.larger, p, nearestPt);
             }
         } else {
